@@ -5,7 +5,7 @@ $("button").on("click", function () {
     var userChoice = searchButton.val();
     pullApiWeather(userChoice);
     pullApiForecast(userChoice);
-    // pullApiUV();
+    pullApiUV();
     console.log(userChoice);
     // console.log(pullApi);
 })
@@ -28,6 +28,8 @@ function pullApiWeather(userChoice) {
             var searchTempMax = response.main.temp_max;
             var searchPressure = response.main.pressure;
             var searchHumidity = response.main.humidity;
+            var searchLonLat = response.coord;
+            console.log(response.coord)
         })
 }
 
@@ -53,8 +55,8 @@ function pullApiForecast(userChoice) {
 }
 
 // run function to pull API info for UV Index. 
-function pullApiUV(userChoice) {
-    var queryURL = "https://api.openweathermap.org/data/2.5/uvi?q=" + userChoice + "&appid=62fbd3039df5554b8330852eff63de44"
+function pullApiUV() {
+    var queryURL = "https://api.openweathermap.org/data/2.5/uvi?appid={appid}&lat={lat}&lon={lon}";
     $.ajax({
         url: queryURL,
         method: "GET"
