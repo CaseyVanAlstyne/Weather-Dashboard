@@ -2,7 +2,7 @@ var searchButton = $("#fname");
 
 $("#mainSearchButton").on("click", function () {
     event.preventDefault();
-    var userChoice = searchButton.val();
+    var userChoice = searchButton.val().trim();
     pullApiWeather(userChoice);
     pullApiForecast(userChoice);
     console.log(userChoice);
@@ -36,16 +36,19 @@ function pullApiWeather(userChoice) {
 
             var weatherDiv = $("<div>");
 
-            var p0 = $("<p>").text("This is what you searched for: " + searchName);
-            var p = $("<p>").text("Current Temperature: " + searchTemp);
-            var p1 = $("<p>").text("It currently feels like: " + searchFeelsLike);
-            var p2 = $("<p>").text("The minimum temperature is " + searchTempMin);
-            var p3 = $("<p>").text("The maximum temperature is " + searchTempMax);
-            var p4 = $("<p>").text("The pressure outside is " + searchPressure);
-            var p5 = $("<p>").text("The humidity level is too high; see: " + searchHumidity);
-            var p6 = $("<p>").text("This is where you currently are. I need to access this information in another function/api call, but can't figure it out. " + JSON.stringify(searchLonLat));
 
-            weatherDiv.append(p0, p, p1, p2, p3, p4, p5, p6);
+            var mainContainer = $("<div>").addClass("jumbotron")
+            var p0 = $("<div>").addClass("card").text("This is what you searched for: " + searchName);
+            var p = $("<div>").addClass("card").text("Current Temperature: " + searchTemp);
+            var p1 = $("<div>").addClass("card").text("It currently feels like: " + searchFeelsLike);
+            var p2 = $("<div>").addClass("card").text("The minimum temperature is " + searchTempMin);
+            var p3 = $("<div>").addClass("card").text("The maximum temperature is " + searchTempMax);
+            var p4 = $("<div>").addClass("card").text("The humidity level is " + searchHumidity);
+            var p5 = $("<div>").addClass("card").text("This is where you currently are. I need to access this information in another function/api call, but can't figure it out. " + JSON.stringify(searchLonLat));
+
+            mainContainer.append(p0, p, p1, p2, p3, p4, p5);
+            weatherDiv.append(mainContainer);
+
 
             $("#resultSnippet").prepend(weatherDiv);
         })
@@ -53,7 +56,6 @@ function pullApiWeather(userChoice) {
 
 // run function to pull API info for 5 day/3 hour forecast. 
 function pullApiForecast(userChoice) {
-
     var queryURL = "https://api.openweathermap.org/data/2.5/forecast?q=" + userChoice + "&appid=62fbd3039df5554b8330852eff63de44";
     $.ajax({
         url: queryURL,
