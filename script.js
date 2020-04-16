@@ -5,7 +5,6 @@ $("button").on("click", function () {
     var userChoice = searchButton.val();
     pullApiWeather(userChoice);
     pullApiForecast(userChoice);
-    pullApiUV();
     console.log(userChoice);
     // console.log(pullApi);
 })
@@ -31,6 +30,7 @@ function pullApiWeather(userChoice) {
             var searchPressure = response.main.pressure;
             var searchHumidity = response.main.humidity;
             var searchLonLat = response.coord;
+            pullApiUV(searchLonLat);
             console.log(response.coord)
 
             var weatherDiv = $("<div>");
@@ -41,7 +41,7 @@ function pullApiWeather(userChoice) {
             var p3 = $("<p>").text("The maximum temperature is " + searchTempMax);
             var p4 = $("<p>").text("The pressure outside is " + searchPressure);
             var p5 = $("<p>").text("The humidity level is too damn high; see: " + searchHumidity);
-            var p6 = $("<p>").text("This is where you currently are. I need to access this information in another function/api call, but can't figure it out. " + searchLonLat);
+            var p6 = $("<p>").text("This is where you currently are. I need to access this information in another function/api call, but can't figure it out. " + JSON.stringify(searchLonLat));
 
             weatherDiv.append(p, p1, p2, p3, p4, p5, p6);
 
@@ -72,9 +72,10 @@ function pullApiForecast(userChoice) {
 }
 
 // run function to pull API info for UV Index. 
-function pullApiUV() {
-
-    var queryURL = "https://api.openweathermap.org/data/2.5/uvi?appid={appid}&lat={lat}&lon={lon}";
+function pullApiUV(lonLat) {
+    var lat = lonLat.lat;
+    var lon = lonLat.lon;
+    var queryURL = "https://api.openweathermap.org/data/2.5/uvi?appid=62fbd3039df5554b8330852eff63de44&lat=" + lat + "&lon=" + lon;
     $.ajax({
         url: queryURL,
         method: "GET"
