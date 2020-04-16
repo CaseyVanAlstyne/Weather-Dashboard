@@ -1,11 +1,12 @@
 var searchButton = $("#fname");
 
-$("button").on("click", function () {
+$("#mainSearchButton").on("click", function () {
     event.preventDefault();
     var userChoice = searchButton.val();
     pullApiWeather(userChoice);
     pullApiForecast(userChoice);
     console.log(userChoice);
+    renderPreviousSearch(userChoice);
     // console.log(pullApi);
 })
 
@@ -35,15 +36,16 @@ function pullApiWeather(userChoice) {
 
             var weatherDiv = $("<div>");
 
+            var p0 = $("<p>").text("This is what you searched for: " + searchName);
             var p = $("<p>").text("Current Temperature: " + searchTemp);
             var p1 = $("<p>").text("It currently feels like: " + searchFeelsLike);
             var p2 = $("<p>").text("The minimum temperature is " + searchTempMin);
             var p3 = $("<p>").text("The maximum temperature is " + searchTempMax);
             var p4 = $("<p>").text("The pressure outside is " + searchPressure);
-            var p5 = $("<p>").text("The humidity level is too damn high; see: " + searchHumidity);
+            var p5 = $("<p>").text("The humidity level is too high; see: " + searchHumidity);
             var p6 = $("<p>").text("This is where you currently are. I need to access this information in another function/api call, but can't figure it out. " + JSON.stringify(searchLonLat));
 
-            weatherDiv.append(p, p1, p2, p3, p4, p5, p6);
+            weatherDiv.append(p0, p, p1, p2, p3, p4, p5, p6);
 
             $("#resultSnippet").prepend(weatherDiv);
         })
@@ -83,4 +85,14 @@ function pullApiUV(lonLat) {
         .then(function (response) {
             console.log(response);
         })
+}
+
+function renderPreviousSearch(userChoice) {
+    // add in a prevent empty submission field, so that an empty button is not created on click of an empty form. 
+    $("#resultSnippet").empty();
+    var previousSearchButton = $("<button>").text(userChoice);
+    $("#repeatButton").prepend(previousSearchButton);
+    // pullApiWeather(userChoice);
+
+    // Create onclick for #repeatButton that will run the pullApiWeather(userChoice) ************************* Expect this not to work
 }
