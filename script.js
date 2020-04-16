@@ -12,6 +12,8 @@ $("button").on("click", function () {
 
 // run function to pull API info for current weather data. 
 function pullApiWeather(userChoice) {
+    // empty the prepended data
+    $("#resultSnippet").empty();
     var queryURL = "https://api.openweathermap.org/data/2.5/weather?q=" + userChoice + "&appid=62fbd3039df5554b8330852eff63de44";
     $.ajax({
         url: queryURL,
@@ -49,6 +51,7 @@ function pullApiWeather(userChoice) {
 
 // run function to pull API info for 5 day/3 hour forecast. 
 function pullApiForecast(userChoice) {
+
     var queryURL = "https://api.openweathermap.org/data/2.5/forecast?q=" + userChoice + "&appid=62fbd3039df5554b8330852eff63de44";
     $.ajax({
         url: queryURL,
@@ -70,6 +73,7 @@ function pullApiForecast(userChoice) {
 
 // run function to pull API info for UV Index. 
 function pullApiUV() {
+
     var queryURL = "https://api.openweathermap.org/data/2.5/uvi?appid={appid}&lat={lat}&lon={lon}";
     $.ajax({
         url: queryURL,
