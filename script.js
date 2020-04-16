@@ -1,6 +1,3 @@
-// Need Search bar
-// Need on click function with .ajax inside of it
-// need to pull information from weather API and display on screen.
 var searchButton = $("#fname");
 
 $("button").on("click", function () {
@@ -20,7 +17,6 @@ function pullApiWeather(userChoice) {
         url: queryURL,
         method: "GET"
     })
-        // We store all of the retrieved data inside of an object called "response"
         .then(function (response) {
             console.log("current stuff", response);
             var searchName = response.name;
@@ -42,7 +38,6 @@ function pullApiForecast(userChoice) {
         url: queryURL,
         method: "GET"
     })
-        // We store all of the retrieved data inside of an object called "response"
         .then(function (response) {
             // console.log("five day", response);
             // console.log(response.list[7].dt_txt);
@@ -50,7 +45,6 @@ function pullApiForecast(userChoice) {
             // console.log(response.list[23].dt_txt);
             // console.log(response.list[31].dt_txt);
             // console.log(response.list[39].dt_txt);
-
             for (var i = 7; i < response.list.length; i += 8) {
                 console.log(i, response.list[i]);
                 response.list[i];
@@ -58,5 +52,14 @@ function pullApiForecast(userChoice) {
         })
 }
 
-// Need a function for UV index API. There is a little trick - WATCH OUT!
-// look into template strings!
+// run function to pull API info for UV Index. 
+function pullApiUV(userChoice) {
+    var queryURL = "https://api.openweathermap.org/data/2.5/uvi?q=" + userChoice + "&appid=62fbd3039df5554b8330852eff63de44"
+    $.ajax({
+        url: queryURL,
+        method: "GET"
+    })
+        .then(function (response) {
+            console.log(response);
+        })
+}
