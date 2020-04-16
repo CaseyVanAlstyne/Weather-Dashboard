@@ -30,6 +30,20 @@ function pullApiWeather(userChoice) {
             var searchHumidity = response.main.humidity;
             var searchLonLat = response.coord;
             console.log(response.coord)
+
+            var weatherDiv = $("<div>");
+
+            var p = $("<p>").text("Current Temperature: " + searchTemp);
+            var p1 = $("<p>").text("It currently feels like: " + searchFeelsLike);
+            var p2 = $("<p>").text("The minimum temperature is " + searchTempMin);
+            var p3 = $("<p>").text("The maximum temperature is " + searchTempMax);
+            var p4 = $("<p>").text("The pressure outside is " + searchPressure);
+            var p5 = $("<p>").text("The humidity level is too damn high; see: " + searchHumidity);
+            var p6 = $("<p>").text("This is where you currently are. I need to access this information in another function/api call, but can't figure it out. " + searchLonLat);
+
+            weatherDiv.append(p, p1, p2, p3, p4, p5, p6);
+
+            $("#resultSnippet").prepend(weatherDiv);
         })
 }
 
