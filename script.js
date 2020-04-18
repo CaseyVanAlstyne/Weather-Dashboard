@@ -34,7 +34,7 @@ function pullApiWeather(userChoice) {
             pullApiUV(searchLonLat);
             // console.log(response.coord)
             var weatherDiv = $("<div>");
-            var mainContainer = $("<div>").addClass("jumbotron")
+            var mainContainer = $("<div>").addClass("jumbotron");
             var p0 = $("<div>").addClass("card").text("This is what you searched for: " + searchName);
             var p = $("<div>").addClass("card").text("Current Temperature: " + searchTemp);
             var p1 = $("<div>").addClass("card").text("It currently feels like: " + searchFeelsLike);
@@ -62,18 +62,51 @@ function pullApiForecast(userChoice) {
             // console.log(response.list[23].dt_txt);
             // console.log(response.list[31].dt_txt);
             // console.log(response.list[39].dt_txt);
+            var weatherDiv = $("<div>");
+            var mainContainer = $("<div>").addClass("jumbotron");
+            var mainRow = $("<div>").addClass("row");
+
             for (var i = 7; i < response.list.length; i += 8) {
                 console.log(i, response.list[i]);
                 response.list[i];
             }
-            var weatherDiv = $("<div>");
-            var mainContainer = $("<div>").addClass("jumbotron")
-            var day1 = $("<div>").addClass("card").text("Here is the weather icon: " + response.list[7].weather[0].icon);
-            var day2 = $("<div>").addClass("card").text("The average temperature for day 2 is: " + response.list[15].main.temp);
-            var day3 = $("<div>").addClass("card").text("The wind speed for day 3 is: " + response.list[23].wind.speed);
-            var day4 = $("<div>").addClass("card").text("Temps feels like: " + response.list[31].main.feels_like);
-            var day5 = $("<div>").addClass("card").text("Max temp for day 5: " + response.list[39].main.temp_max);
-            mainContainer.append(day1, day2, day3, day4, day5);
+
+            var column1 = $("<div>").addClass("col card");
+            var day1Temp = $("<div>").text("Here is the weather icon: " + response.list[7].main.temp);
+            var day1Humidity = $("<div>").text("Here is the humidity: " + response.list[7].main.humidity);
+            column1.append(day1Temp, day1Humidity);
+            mainRow.append(column1);
+
+            var column2 = $("<div>").addClass("col card");
+            var day2Temp = $("<div>").text("Here is the weather icon: " + response.list[15].main.temp);
+            var day2Humidity = $("<div>").text("Here is the humidity: " + response.list[15].main.humidity);
+            column2.append(day2Temp, day2Humidity);
+            mainRow.append(column2);
+
+            var column3 = $("<div>").addClass("col card");
+            var day3Temp = $("<div>").text("Here is the weather icon: " + response.list[23].main.temp);
+            var day3Humidity = $("<div>").text("Here is the humidity: " + response.list[23].main.humidity);
+            column3.append(day3Temp, day3Humidity);
+            mainRow.append(column3);
+
+            var column4 = $("<div>").addClass("col card");
+            var day4Temp = $("<div>").text("Here is the weather icon: " + response.list[31].main.temp);
+            var day4Humidity = $("<div>").text("Here is the humidity: " + response.list[31].main.humidity);
+            column4.append(day4Temp, day4Humidity);
+            mainRow.append(column4);
+
+            var column5 = $("<div>").addClass("col card");
+            var day5Temp = $("<div>").text("Here is the weather icon: " + response.list[39].main.temp);
+            var day5Humidity = $("<div>").text("Here is the humidity: " + response.list[39].main.humidity);
+            column5.append(day5Temp, day5Humidity);
+            mainRow.append(column5);
+
+            // var day2 = $("<div>").addClass("card").text("The average temperature for day 2 is: " + response.list[15].main.temp);
+            // var day3 = $("<div>").addClass("card").text("The wind speed for day 3 is: " + response.list[23].wind.speed);
+            // var day4 = $("<div>").addClass("card").text("Temps feels like: " + response.list[31].main.feels_like);
+            // var day5 = $("<div>").addClass("card").text("Max temp for day 5: " + response.list[39].main.temp_max);
+
+            mainContainer.append(mainRow);
             weatherDiv.append(mainContainer);
             $("#resultForecastSnippet").prepend(weatherDiv);
         })
@@ -95,9 +128,17 @@ function pullApiUV(lonLat) {
 
 function renderPreviousSearch(userChoice) {
     // add in a prevent empty submission field, so that an empty button is not created on click of an empty form. 
-    $("#resultSnippet").empty();
+    // $("#resultForecastSnippet").empty();
+    // $("#resultWeatherSnippet").empty();
     var previousSearchButton = $("<button>").text(userChoice);
     $("#repeatButton").prepend(previousSearchButton);
-    // pullApiWeather(userChoice);
-    // Create onclick for #repeatButton that will run the pullApiWeather(userChoice) ************************* Expect this not to work
+    previousSearchButton.on("click", function () {
+        $("#resultForecastSnippet").empty();
+        $("#resultWeatherSnippet").empty();
+        pullApiWeather(userChoice);
+        pullApiForecast(userChoice);
+        console.log("new string", userChoice);
+        // console.log(pullApi);
+    })
 }
+// extract information from the button
