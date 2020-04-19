@@ -1,8 +1,11 @@
 var searchButton = $("#fname");
+var blankArray = [];
 
 $("#mainSearchButton").on("click", function () {
     event.preventDefault();
     var userChoice = searchButton.val().trim();
+    blankArray.push(userChoice);
+    setLocalStorage();
     pullApiWeather(userChoice);
     pullApiForecast(userChoice);
     console.log(userChoice);
@@ -141,4 +144,20 @@ function renderPreviousSearch(userChoice) {
         // console.log(pullApi);
     })
 }
-// extract information from the button
+
+function getLocalStorage() {
+    // Get stored todos from localStorage
+    // Parsing the JSON string to an object
+    var storedCity = JSON.parse(localStorage.getItem("savedCity"));
+    // If todos were retrieved from localStorage, update the todos array to it
+    if (storedCity !== null) {
+        blankArray = storedCity;
+    }
+}
+
+function setLocalStorage() {
+    localStorage.setItem("savedCity", JSON.stringify(blankArray));
+}
+
+getLocalStorage();
+// how to render buttons onload utilizing the above function?
