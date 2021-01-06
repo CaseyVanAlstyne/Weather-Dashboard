@@ -1,163 +1,162 @@
-var searchButton = $("#fname");
-var blankArray = [];
+$(document).ready(function () {
+  $("#search-button").on("click", function () {
+    var searchValue = $("#search-value").val();
 
-$("#mainSearchButton").on("click", function () {
-    event.preventDefault();
-    var userChoice = searchButton.val().trim();
-    blankArray.push(userChoice);
-    setLocalStorage();
-    pullApiWeather(userChoice);
-    pullApiForecast(userChoice);
-    console.log(userChoice);
-    renderPreviousSearch(userChoice);
-    // console.log(pullApi);
-})
+    // clear input box
+    $("#search-value").val("");
 
-// run function to pull API info for current weather data. 
-function pullApiWeather(userChoice) {
-    // empty the prepended data
-    $("#resultSnippet").empty();
-    var queryURL = "https://api.openweathermap.org/data/2.5/weather?q=" + userChoice + "&appid=62fbd3039df5554b8330852eff63de44";
+    searchWeather(searchValue);
+  });
+
+  $(".history").on("click", "li", function () {
+    searchWeather($(this).text());
+  });
+
+  function makeRow(text) {
+    var li = $("<li>")
+      .addClass("list-group-item list-group-item-action")
+      .text(text);
+    $(".history").append(li);
+  }
+
+  function searchWeather(searchValue) {
     $.ajax({
-        url: queryURL,
-        method: "GET"
-    })
-        .then(function (response) {
-            console.log("current stuff", response);
-            var searchName = response.name;
-            // console.log(searchName);
-            var searchTemp = response.main.temp;
-            // console.log(searchTemp);
-            var searchFeelsLike = response.main.feels_like;
-            var searchTempMin = response.main.temp_min;
-            var searchTempMax = response.main.temp_max;
-            var searchPressure = response.main.pressure;
-            var searchHumidity = response.main.humidity;
-            var searchLonLat = response.coord;
-            pullApiUV(searchLonLat);
-            // console.log(response.coord)
-            var weatherDiv = $("<div>");
-            var mainContainer = $("<div>").addClass("jumbotron");
-            var p0 = $("<div>").addClass("card").text("This is what you searched for: " + searchName);
-            var p = $("<div>").addClass("card").text("Current Temperature: " + searchTemp);
-            var p1 = $("<div>").addClass("card").text("It currently feels like: " + searchFeelsLike);
-            var p2 = $("<div>").addClass("card").text("The minimum temperature is " + searchTempMin);
-            var p3 = $("<div>").addClass("card").text("The maximum temperature is " + searchTempMax);
-            var p4 = $("<div>").addClass("card").text("The humidity level is " + searchHumidity);
-            var p5 = $("<div>").addClass("card").text("This is where you currently are. I need to access this information in another function/api call, but can't figure it out. " + JSON.stringify(searchLonLat));
-            mainContainer.append(p0, p, p1, p2, p3, p4, p5);
-            weatherDiv.append(mainContainer);
-            $("#resultWeatherSnippet").prepend(weatherDiv);
-        })
-}
+      type: "GET",
+      url:
+        "http://api.openweathermap.org/data/2.5/weather?q=" +
+        searchValue +
+        "&appid=7ba67ac190f85fdba2e2dc6b9d32e93c&units=imperial",
+      dataType: "json",
+      success: function (data) {
+        // create history link for this search
+        if (history.indexOf(searchValue) === -1) {
+          history.push(searchValue);
+          window.localStorage.setItem("history", JSON.stringify(history));
 
-// run function to pull API info for 5 day/3 hour forecast. 
-function pullApiForecast(userChoice) {
-    var queryURL = "https://api.openweathermap.org/data/2.5/forecast?q=" + userChoice + "&appid=62fbd3039df5554b8330852eff63de44";
+          makeRow(searchValue);
+        }
+
+        // clear any old content
+        $("#today").empty();
+
+        // create html content for current weather
+        var title = $("<h3>")
+          .addClass("card-title")
+          .text(data.name + " (" + new Date().toLocaleDateString() + ")");
+        var card = $("<div>").addClass("card");
+        var wind = $("<p>")
+          .addClass("card-text")
+          .text("Wind Speed: " + data.wind.speed + " MPH");
+        var humid = $("<p>")
+          .addClass("card-text")
+          .text("Humidity: " + data.main.humidity + "%");
+        var temp = $("<p>")
+          .addClass("card-text")
+          .text("Temperature: " + data.main.temp + " °F");
+        var cardBody = $("<div>").addClass("card-body");
+        var img = $("<img>").attr(
+          "src",
+          "http://openweathermap.org/img/w/" + data.weather[0].icon + ".png"
+        );
+
+        // merge and add to page
+        title.append(img);
+        cardBody.append(title, temp, humid, wind);
+        card.append(cardBody);
+        $("#today").append(card);
+
+        // call follow-up api endpoints
+        getForecast(searchValue);
+        getUVIndex(data.coord.lat, data.coord.lon);
+      },
+    });
+  }
+
+  function getForecast(searchValue) {
     $.ajax({
-        url: queryURL,
-        method: "GET"
-    })
-        .then(function (response) {
-            // console.log("five day", response);
-            // console.log(response.list[7].dt_txt);
-            // console.log(response.list[15].dt_txt);
-            // console.log(response.list[23].dt_txt);
-            // console.log(response.list[31].dt_txt);
-            // console.log(response.list[39].dt_txt);
-            var weatherDiv = $("<div>");
-            var mainContainer = $("<div>").addClass("jumbotron");
-            var mainRow = $("<div>").addClass("row");
+      type: "GET",
+      url:
+        "http://api.openweathermap.org/data/2.5/forecast?q=" +
+        searchValue +
+        "&appid=7ba67ac190f85fdba2e2dc6b9d32e93c&units=imperial",
+      dataType: "json",
+      success: function (data) {
+        // overwrite any existing content with title and empty row
+        $("#forecast")
+          .html('<h4 class="mt-3">5-Day Forecast:</h4>')
+          .append('<div class="row">');
 
-            for (var i = 7; i < response.list.length; i += 8) {
-                console.log(i, response.list[i]);
-                response.list[i];
-            }
+        // loop over all forecasts (by 3-hour increments)
+        for (var i = 0; i < data.list.length; i++) {
+          // only look at forecasts around 3:00pm
+          if (data.list[i].dt_txt.indexOf("15:00:00") !== -1) {
+            // create html elements for a bootstrap card
+            var col = $("<div>").addClass("col-md-2");
+            var card = $("<div>").addClass("card bg-primary text-white");
+            var body = $("<div>").addClass("card-body p-2");
 
-            var column1 = $("<div>").addClass("col card");
-            var day1Temp = $("<div>").text("Here is the weather icon: " + response.list[7].main.temp);
-            var day1Humidity = $("<div>").text("Here is the humidity: " + response.list[7].main.humidity);
-            column1.append(day1Temp, day1Humidity);
-            mainRow.append(column1);
+            var title = $("<h5>")
+              .addClass("card-title")
+              .text(new Date(data.list[i].dt_txt).toLocaleDateString());
 
-            var column2 = $("<div>").addClass("col card");
-            var day2Temp = $("<div>").text("Here is the weather icon: " + response.list[15].main.temp);
-            var day2Humidity = $("<div>").text("Here is the humidity: " + response.list[15].main.humidity);
-            column2.append(day2Temp, day2Humidity);
-            mainRow.append(column2);
+            var img = $("<img>").attr(
+              "src",
+              "http://openweathermap.org/img/w/" +
+                data.list[i].weather[0].icon +
+                ".png"
+            );
 
-            var column3 = $("<div>").addClass("col card");
-            var day3Temp = $("<div>").text("Here is the weather icon: " + response.list[23].main.temp);
-            var day3Humidity = $("<div>").text("Here is the humidity: " + response.list[23].main.humidity);
-            column3.append(day3Temp, day3Humidity);
-            mainRow.append(column3);
+            var p1 = $("<p>")
+              .addClass("card-text")
+              .text("Temp: " + data.list[i].main.temp_max + " °F");
+            var p2 = $("<p>")
+              .addClass("card-text")
+              .text("Humidity: " + data.list[i].main.humidity + "%");
 
-            var column4 = $("<div>").addClass("col card");
-            var day4Temp = $("<div>").text("Here is the weather icon: " + response.list[31].main.temp);
-            var day4Humidity = $("<div>").text("Here is the humidity: " + response.list[31].main.humidity);
-            column4.append(day4Temp, day4Humidity);
-            mainRow.append(column4);
+            // merge together and put on page
+            col.append(card.append(body.append(title, img, p1, p2)));
+            $("#forecast .row").append(col);
+          }
+        }
+      },
+    });
+  }
 
-            var column5 = $("<div>").addClass("col card");
-            var day5Temp = $("<div>").text("Here is the weather icon: " + response.list[39].main.temp);
-            var day5Humidity = $("<div>").text("Here is the humidity: " + response.list[39].main.humidity);
-            column5.append(day5Temp, day5Humidity);
-            mainRow.append(column5);
-
-            // var day2 = $("<div>").addClass("card").text("The average temperature for day 2 is: " + response.list[15].main.temp);
-            // var day3 = $("<div>").addClass("card").text("The wind speed for day 3 is: " + response.list[23].wind.speed);
-            // var day4 = $("<div>").addClass("card").text("Temps feels like: " + response.list[31].main.feels_like);
-            // var day5 = $("<div>").addClass("card").text("Max temp for day 5: " + response.list[39].main.temp_max);
-
-            mainContainer.append(mainRow);
-            weatherDiv.append(mainContainer);
-            $("#resultForecastSnippet").prepend(weatherDiv);
-        })
-}
-
-// run function to pull API info for UV Index. 
-function pullApiUV(lonLat) {
-    var lat = lonLat.lat;
-    var lon = lonLat.lon;
-    var queryURL = "https://api.openweathermap.org/data/2.5/uvi?appid=62fbd3039df5554b8330852eff63de44&lat=" + lat + "&lon=" + lon;
+  function getUVIndex(lat, lon) {
     $.ajax({
-        url: queryURL,
-        method: "GET"
-    })
-        .then(function (response) {
-            console.log(response);
-        })
-}
+      type: "GET",
+      url:
+        "http://api.openweathermap.org/data/2.5/uvi?appid=7ba67ac190f85fdba2e2dc6b9d32e93c&lat=" +
+        lat +
+        "&lon=" +
+        lon,
+      dataType: "json",
+      success: function (data) {
+        var uv = $("<p>").text("UV Index: ");
+        var btn = $("<span>").addClass("btn btn-sm").text(data.value);
 
-function renderPreviousSearch(userChoice) {
-    // add in a prevent empty submission field, so that an empty button is not created on click of an empty form. 
-    // $("#resultForecastSnippet").empty();
-    // $("#resultWeatherSnippet").empty();
-    var previousSearchButton = $("<button>").text(userChoice);
-    $("#repeatButton").prepend(previousSearchButton);
-    previousSearchButton.on("click", function () {
-        $("#resultForecastSnippet").empty();
-        $("#resultWeatherSnippet").empty();
-        pullApiWeather(userChoice);
-        pullApiForecast(userChoice);
-        console.log("new string", userChoice);
-        // console.log(pullApi);
-    })
-}
+        // change color depending on uv value
+        if (data.value < 3) {
+          btn.addClass("btn-success");
+        } else if (data.value < 7) {
+          btn.addClass("btn-warning");
+        } else {
+          btn.addClass("btn-danger");
+        }
 
-function getLocalStorage() {
-    // Get stored todos from localStorage
-    // Parsing the JSON string to an object
-    var storedCity = JSON.parse(localStorage.getItem("savedCity"));
-    // If todos were retrieved from localStorage, update the todos array to it
-    if (storedCity !== null) {
-        blankArray = storedCity;
-    }
-}
+        $("#today .card-body").append(uv.append(btn));
+      },
+    });
+  }
 
-function setLocalStorage() {
-    localStorage.setItem("savedCity", JSON.stringify(blankArray));
-}
+  // get current history, if any
+  var history = JSON.parse(window.localStorage.getItem("history")) || [];
 
-getLocalStorage();
-// how to render buttons onload utilizing the above function?
+  if (history.length > 0) {
+    searchWeather(history[history.length - 1]);
+  }
+
+  for (var i = 0; i < history.length; i++) {
+    makeRow(history[i]);
+  }
+});
