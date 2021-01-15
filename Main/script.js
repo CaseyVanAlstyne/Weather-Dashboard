@@ -23,9 +23,9 @@ $(document).ready(function () {
     $.ajax({
       type: "GET",
       url:
-        "api.openweathermap.org/data/2.5/weather?q=" +
+        "http://api.openweathermap.org/data/2.5/weather?q=" +
         searchValue +
-        "&62fbd3039df5554b8330852eff63de44",
+        "&appid=62fbd3039df5554b8330852eff63de44",
       dataType: "json",
       success: function (data) {
         // create history link for this search
@@ -46,7 +46,7 @@ $(document).ready(function () {
         var card = $("<div>").addClass("card");
         var wind = $("<p>")
           .addClass("card-text")
-          .text("Wind Speed: " + response.wind.speed + " MPH");
+          .text("Wind Speed: " + data.wind.speed + " MPH");
         var humid = $("<p>")
           .addClass("card-text")
           .text("Humidity: " + data.main.humidity + "%");
