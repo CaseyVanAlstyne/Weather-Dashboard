@@ -25,7 +25,7 @@ $(document).ready(function () {
       url:
         "http://api.openweathermap.org/data/2.5/weather?q=" +
         searchValue +
-        "&appid=62fbd3039df5554b8330852eff63de44",
+        "&appid=254694d161b7b682294b828251dcca90&units=imperial",
       dataType: "json",
       success: function (data) {
         // create history link for this search
@@ -78,7 +78,7 @@ $(document).ready(function () {
       url:
         "http://api.openweathermap.org/data/2.5/forecast?q=" +
         searchValue +
-        "&appid=7ba67ac190f85fdba2e2dc6b9d32e93c&units=imperial",
+        "&appid=254694d161b7b682294b828251dcca90&units=imperial",
       dataType: "json",
       success: function (data) {
         // overwrite any existing content with title and empty row
@@ -126,7 +126,7 @@ $(document).ready(function () {
     $.ajax({
       type: "GET",
       url:
-        "http://api.openweathermap.org/data/2.5/uvi?appid=7ba67ac190f85fdba2e2dc6b9d32e93c&lat=" +
+        "http://api.openweathermap.org/data/2.5/uvi?appid=254694d161b7b682294b828251dcca90&lat=" +
         lat +
         "&lon=" +
         lon,
